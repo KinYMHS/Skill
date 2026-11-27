@@ -1,0 +1,9 @@
+{
+  "name": "skill-directory",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node preview.mjs"
+  }
+}
