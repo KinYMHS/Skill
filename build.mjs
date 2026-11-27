@@ -2,7 +2,7 @@ import {mkdir, readFile, writeFile} from "node:fs/promises";
 
 const files = ["index.html", "style.css", "app.js", "skills.json"];
 const [index, css, script, dataText, worker, manifest] = await Promise.all(
-  [...files.map(file => `web/${file}`), "worker/index.js", ".openai/hosting.json"]
+  [...files, "worker/index.js", ".openai/hosting.json"]
     .map(path => readFile(new URL(path, import.meta.url), "utf8"))
 );
 const data = JSON.parse(dataText.replace(/^\uFEFF/, ""));
