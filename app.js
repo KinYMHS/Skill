@@ -44,7 +44,7 @@ function button(label, className, action) {
 }
 
 async function request(path, options) {
-  const response = await fetch(path, options);
+  const response = await fetch(new URL(path, document.baseURI), options);
   const data = await response.json().catch(() => null);
   if (!response.ok || !data) throw new Error(data?.error || "目前無法連線，請稍後再試。");
   return data;
@@ -54,7 +54,9 @@ async function loadSkills() {
   manage.disabled = true;
   byId("load-error").hidden = true;
   try {
-    const data = await request("/api/skills");
+    const data = window.SKILL_STATIC
+      ? await (await fetch(new URL("./skills.json", document.baseURI))).json()
+      : await request("api/skills");
     categories = data.categories;
     skills = data.skills;
     ready = true;
@@ -216,7 +218,7 @@ async function saveSkill(event) {
   save.disabled = true;
   save.textContent = "儲存中…";
   try {
-    const result = await request("/api/skills", {
+    const result = await request("api/skills", {
       method: editing ? "PUT" : "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({...details, version: editing?.version}),
