@@ -28,6 +28,8 @@ let ready = false;
 let saving = false;
 let restoreFocus = null;
 let toastTimer;
+const staticSite = document.documentElement.dataset.catalogMode === "static" ||
+  window.location.hostname.endsWith("github.io");
 
 function element(tag, className, value) {
   const node = document.createElement(tag);
@@ -54,13 +56,21 @@ async function loadSkills() {
   manage.disabled = true;
   byId("load-error").hidden = true;
   try {
-    const data = window.SKILL_STATIC
+    const data = staticSite
       ? await (await fetch(new URL("./skills.json", document.baseURI))).json()
       : await request("api/skills");
     categories = data.categories;
     skills = data.skills;
     ready = true;
     manage.disabled = false;
+    if (staticSite) {
+      manage.hidden = true;
+      byId("add").hidden = true;
+      byId("editor").remove();
+      byId("footer-source")?.setAttribute("hidden", "");
+      const status = element("span", "read-only-note", "唯讀目錄 · 更新條目請使用 Sites 版本");
+      byId("count").parentElement.append(status);
+    }
     render();
   } catch (error) {
     const notice = byId("load-error");
@@ -214,6 +224,11 @@ async function saveSkill(event) {
   details.example = details.example.trim();
   const errorMessage = byId("form-error");
   errorMessage.hidden = true;
+  if (staticSite) {
+    errorMessage.textContent = "GitHub Pages 只提供瀏覽。請使用 Sites 版本更新 Skill。";
+    errorMessage.hidden = false;
+    return;
+  }
   saving = true;
   save.disabled = true;
   save.textContent = "儲存中…";

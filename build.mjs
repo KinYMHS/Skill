@@ -6,8 +6,8 @@ const [index, css, script, dataText, worker, manifest] = await Promise.all(
     .map(path => readFile(new URL(path, import.meta.url), "utf8"))
 );
 const data = JSON.parse(dataText.replace(/^\uFEFF/, ""));
-const staticScript = script.replace("const byId = id => document.getElementById(id);", "const byId = id => document.getElementById(id);\nwindow.SKILL_STATIC = true;");
-const staticIndex = index.replace('href="./style.css"', 'href="./style.css"').replace('src="./app.js"', 'src="./app.js"');
+const staticScript = script;
+const staticIndex = index.replace("<html lang=\"zh-Hant\">", "<html lang=\"zh-Hant\" data-catalog-mode=\"static\">");
 const assets = {"/": staticIndex, "/index.html": staticIndex, "/style.css": css, "/app.js": script};
 const bundle = `const assets = ${JSON.stringify(assets)};\nconst seed = ${JSON.stringify(data)};\n${worker}`;
 await Promise.all(["dist/server/", "dist/.openai/", "dist/pages/"].map(path => mkdir(new URL(path, import.meta.url), {recursive:true})));
